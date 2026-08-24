@@ -1,4 +1,52 @@
-# Islamic Daily Quiz — Current State (2026-08-19)
+# Islamic Daily Quiz — Current State (2026-08-24)
+
+## Changes this session (2026-08-24)
+
+Improvement pass — 5 features, each verified (npm test 32/32, eslint clean,
+tsc clean, next build clean) and pushed as its own feature branch + main.
+
+**Housekeeping**
+- Committed previously-untracked files (docs, configs, `public/`, supabase
+  migration) and the uncommitted 2026-08-19 timer-bar tweak. `.gitignore` now
+  excludes `/.tmp-run/` and `*.backup`.
+
+**Feature: sound mute toggle**
+- `src/lib/sound.ts` — persisted zustand store (`idq-sound-v1`, default on).
+- `src/lib/sfx.ts` — `audio()` returns null when muted, so every SFX call is
+  a no-op.
+- `src/components/SoundToggle.tsx` — volume icon button in TopNav next to
+  ThemeToggle (`aria-pressed`).
+
+**Feature: share your score**
+- `src/components/ShareResult.tsx` — Web Share API with clipboard fallback
+  ("Copied to clipboard" for 2s). Text: score, streak, site link.
+- Wired into the QuizPlayer results card.
+
+**Feature: streak milestone banner**
+- `src/components/QuizPlayer.tsx` — gold banner on the results screen when
+  the new streak hits 3/7/30/100 (the milestones promised in PLAN.md).
+
+**Feature: PNG PWA icons (closes the install-prompt gap)**
+- `scripts/generate-icons.mjs` (sharp, dev-only) rasterizes the SVG into
+  `public/icons/icon-192.png`, `icon-512.png`, and `src/app/apple-icon.png`
+  (180px, auto-emits the apple-touch-icon link). Rerun after editing the SVG.
+- `src/app/manifest.ts` lists the PNGs first; SVG entries kept.
+- Known polish item: the maskable entry still uses the raw SVG whose artwork
+  is off-center — a dedicated padded maskable PNG would be safer on round
+  launchers.
+
+**Feature: 14-day activity strip**
+- `src/components/ActivityStrip.tsx` + dashboard section — one cell per day,
+  gold when a quiz was completed, with an n/14 completed count.
+
+**Not addressed this session (still open)**
+- Supabase auth/sync verification (needs a real Supabase project + migration
+  + end-to-end account test).
+- Full question-bank Islamic-knowledge second pass (only 3 flagged items were
+  ever reviewed; all 300 are confidence:"high" but the comprehensive pass is
+  still pending).
+- Analytics (no activation/retention measurement yet), CSP nonce hardening,
+  true push notifications (site-open reminders work).
 
 ## Changes this session (2026-08-19)
 
