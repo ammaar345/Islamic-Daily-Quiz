@@ -5,6 +5,7 @@ import { useQuizStore, useLevelInfo } from "@/lib/store";
 import { isQuizDone } from "@/lib/progress";
 import { LevelRing } from "@/components/LevelRing";
 import { Achievements } from "@/components/Achievements";
+import { ActivityStrip } from "@/components/ActivityStrip";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 
@@ -146,6 +147,11 @@ export default function DashboardPage() {
             <p className="mt-1 text-sm text-ink-soft">{s.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Consistency strip */}
+      <div className="glass rounded-card p-6 animate-fade-up">
+        <ActivityStrip sessions={progress.sessions} />
       </div>
 
       {/* Review pool / practice */}
