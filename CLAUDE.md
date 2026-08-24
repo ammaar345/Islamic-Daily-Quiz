@@ -1,5 +1,45 @@
 # Islamic Daily Quiz — Current State (2026-08-24)
 
+## TODO — priority actions (2026-08-24)
+
+Do these in order. 1–2 block launch; 3–5 should happen before or right after it.
+
+1. **Verify Supabase auth + sync (LAUNCH BLOCKER — code done, never tested
+   against a real backend, ~1 hour)**
+   - Create a free project at supabase.com
+   - SQL Editor → paste `supabase/migrations/001_initial_schema.sql` → run
+   - Copy `.env.local.example` to `.env.local`, fill in
+     `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `npm run dev` → sign up → do a quiz → reload → confirm progress
+     persists; sign out/in on a second browser to confirm sync
+   - Deploy to Vercel (free tier) with the env vars + `NEXT_PUBLIC_SITE_URL`
+     set, and repeat the end-to-end test there
+
+2. **Question-bank second pass (LAUNCH BLOCKER — religious accuracy)**
+   - All 300 questions are `confidence:"high"` but only 3 ever got a real
+     review by someone with Islamic knowledge
+   - Have a knowledgeable person read `src/lib/questions/` and verify every
+     citation: hadith numbers against sunnah.com, Quran surah:ayah, seerah
+     claims. Fix or delete anything weak. Do not skip this.
+
+3. **Set `NEXT_PUBLIC_SITE_URL` at deploy** — the share-your-score text and
+   SEO metadata use it; the placeholder
+   `https://islamic-daily-quiz.vercel.app` will 404 otherwise.
+
+4. **Enable analytics (free)** — Vercel Analytics on the deploy. Without it
+   there is no way to measure activation, D1/D7 retention, or onboarding
+   drop-off.
+
+5. **Cap stored sessions (~60)** — `progress.sessions` grows forever in
+   localStorage (and syncs whole). After a year of daily use that is 365
+   sessions per user. Trim to the last ~60 on load/save when sync is next
+   touched.
+
+Later (not launch-blocking): padded maskable PNG icon (current maskable entry
+reuses the off-center SVG — round launchers may crop the crescent); true push
+notifications (needs a push service; site-open reminders already work);
+streak shield; CSP nonce hardening; leaderboard / premium decisions.
+
 ## Changes this session (2026-08-24)
 
 Improvement pass — 5 features, each verified (npm test 32/32, eslint clean,
@@ -40,13 +80,7 @@ tsc clean, next build clean) and pushed as its own feature branch + main.
   gold when a quiz was completed, with an n/14 completed count.
 
 **Not addressed this session (still open)**
-- Supabase auth/sync verification (needs a real Supabase project + migration
-  + end-to-end account test).
-- Full question-bank Islamic-knowledge second pass (only 3 flagged items were
-  ever reviewed; all 300 are confidence:"high" but the comprehensive pass is
-  still pending).
-- Analytics (no activation/retention measurement yet), CSP nonce hardening,
-  true push notifications (site-open reminders work).
+- See "TODO — priority actions" at the top of this file for the live list.
 
 ## Changes this session (2026-08-19)
 
