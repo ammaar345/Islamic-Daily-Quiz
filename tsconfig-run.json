@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": ".tmp-run",
+    "paths": { "@/*": ["./src/*"] },
+    "incremental": false,
+    "jsx": "react-jsx"
+  },
+  "include": ["test-quiz.ts", "audit-questions.ts", "_sim-store.ts", "src/**/*.ts"]
+}

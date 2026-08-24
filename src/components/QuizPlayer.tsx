@@ -94,7 +94,6 @@ export function QuizPlayer() {
   // Start the session once on mount.
   useEffect(() => {
     if (!session) startQuiz();
-     
   }, [session, startQuiz]);
 
   const q = session?.questions[idx];
@@ -314,7 +313,7 @@ export function QuizPlayer() {
       </div>
 
       {/* Time remaining bar — drains once per second, snaps off when locked */}
-      <div className="mb-6 h-1 overflow-hidden rounded-full bg-ink/10">
+      <div className="mb-6 h-2 overflow-hidden rounded-full bg-ink/20">
         <div
           className="h-full rounded-full bg-gradient-to-r from-primary to-gold transition-[width] duration-1000 ease-linear"
           style={{
