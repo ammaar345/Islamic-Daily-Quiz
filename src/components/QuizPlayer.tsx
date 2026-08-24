@@ -16,6 +16,7 @@ import { isQuizDone } from "@/lib/progress";
 import { sfxComplete, sfxCorrect, sfxLevelUp, sfxWrong } from "@/lib/sfx";
 import { ConfettiBurst } from "./ConfettiBurst";
 import { PillarTag } from "./PillarTag";
+import { ShareResult } from "./ShareResult";
 import { Button } from "./ui/Button";
 import { cn } from "@/lib/cn";
 
@@ -236,7 +237,15 @@ export function QuizPlayer() {
           </motion.div>
         )}
 
-        <Link href="/dashboard" className="mt-6 inline-block">
+        <div className="mt-6">
+          <ShareResult
+            score={result.score}
+            total={result.total}
+            streak={progress?.streak ?? 0}
+          />
+        </div>
+
+        <Link href="/dashboard" className="mt-3 inline-block">
           <Button>Back to dashboard</Button>
         </Link>
       </motion.div>
