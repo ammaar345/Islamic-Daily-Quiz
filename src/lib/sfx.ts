@@ -1,12 +1,15 @@
 /**
  * SFX via Web Audio API — synthesized chimes, no audio assets needed.
  * Created lazily on first user gesture (browsers block audio before that).
- * All calls are safe no-ops if audio is unavailable.
+ * All calls are safe no-ops if audio is unavailable or sound is muted.
  */
+import { isSoundEnabled } from "./sound";
+
 let ctx: AudioContext | null = null;
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined") return null;
+  if (!isSoundEnabled()) return null;
   if (!ctx) {
     try {
       const AC =

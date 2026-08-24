@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuizStore, useLevelInfo } from "@/lib/store";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SoundToggle } from "@/components/SoundToggle";
 import { cn } from "@/lib/cn";
 
 const LINKS = [
@@ -68,6 +69,7 @@ export function TopNav() {
             <span className="hidden max-w-[9rem] truncate text-sm font-medium text-ink-soft lg:block">
               {progress.name}
             </span>
+            <SoundToggle />
             <ThemeToggle />
             <button
               onClick={() => {
