@@ -13,6 +13,20 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0F766E",
     lang: "en",
     icons: [
+      // PNG 192/512 are required for Chrome install prompts (SVG-only fails).
+      // Regenerate via: node scripts/generate-icons.mjs
+      {
+        src: "/icons/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
       {
         src: "/icons/icon.svg",
         sizes: "any",
