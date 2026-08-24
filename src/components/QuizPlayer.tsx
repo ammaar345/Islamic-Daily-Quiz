@@ -22,6 +22,9 @@ import { cn } from "@/lib/cn";
 
 const PER_QUESTION_SECONDS = 45;
 
+// Streak milestones celebrated on the results screen (from PLAN.md).
+const STREAK_MILESTONES = [3, 7, 30, 100];
+
 // useTransform subscribes the rendered <motion.span> to the motion value,
 // so the number animates when mv changes. Previously used mv.get() in a
 // static span which reads once at mount and never updates visually.
@@ -211,6 +214,22 @@ export function QuizPlayer() {
             className="mt-5 inline-block animate-glow-pulse rounded-full bg-gradient-to-b from-gold to-gold-deep px-5 py-2 text-sm font-bold text-white"
           >
             Level up! You reached level {levelInfo?.level}
+          </motion.p>
+        )}
+
+        {progress && STREAK_MILESTONES.includes(progress.streak) && (
+          <motion.p
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              delay: anyLevelUp ? 0.25 : 0,
+              type: "spring",
+              stiffness: 320,
+              damping: 18,
+            }}
+            className="mt-3 inline-block rounded-full border border-gold/50 bg-gold-soft px-5 py-2 text-sm font-bold text-gold-deep"
+          >
+            {progress.streak}-day streak milestone!
           </motion.p>
         )}
 
