@@ -17,6 +17,7 @@ import { getQuestion } from "./questions";
 import { supabase } from "./supabase";
 import { fetchServerProgress, queuePush } from "./sync";
 import { friendlyAuthError } from "./auth";
+import { useToastStore } from "@/lib/toastStore";
 
 const EMPTY_PROGRESS = (
   name: string,
@@ -54,6 +55,8 @@ interface QuizStore {
   currentSession: QuizSession | null;
   /** Live practice (review-pool) session. Separate from the daily gate/XP path. */
   practiceSession: QuizSession | null;
+  setProgress: (p: UserProgress) => void;
+  resetProgress: () => void;
   signIn: (
     name: string,
     email: string,
@@ -78,6 +81,9 @@ export const useQuizStore = create<QuizStore>()(
       progress: null,
       currentSession: null,
       practiceSession: null,
+      setProgress: (p: UserProgress) => set({ progress: p }),
+      resetProgress: () =>
+        set({ progress: null, currentSession: null, practiceSession: null }),
 
       signIn: async (
         name,
@@ -86,6 +92,7 @@ export const useQuizStore = create<QuizStore>()(
         startingXp = 0,
         reminderTime = "08:00",
       ) => {
+        const toast = useToastStore.getState().addToast;
         // ---- Demo mode: local progress only ----
         if (!supabase) {
           set({
@@ -95,6 +102,11 @@ export const useQuizStore = create<QuizStore>()(
               startingXp,
               reminderTime,
             ),
+          });
+          toast({
+            title: "Welcome!",
+            description: "You're in demo mode. Connect Supabase for cross-device sync.",
+            type: "info",
           });
           return { ok: true };
         }
@@ -109,6 +121,11 @@ export const useQuizStore = create<QuizStore>()(
           // An existing-but-unconfirmed account fails signIn; don't mislead
           // with the "check your password" path below.
           if (signInErr.message.toLowerCase().includes("not confirmed")) {
+            toast({
+              title: "Email not confirmed",
+              description: "Confirm your email first, then sign in.",
+              type: "error",
+            });
             return {
               ok: false,
               error: "Confirm your email first, then sign in.",
@@ -125,6 +142,13 @@ export const useQuizStore = create<QuizStore>()(
             const registered = signUpErr.message
               .toLowerCase()
               .includes("already registered");
+            toast({
+              title: "Sign up failed",
+              description: registered
+                ? "That email is registered — check your password."
+                : friendlyAuthError(signUpErr),
+              type: "error",
+            });
             return {
               ok: false,
               error: registered
@@ -137,12 +161,28 @@ export const useQuizStore = create<QuizStore>()(
             data: { session },
           } = await supabase.auth.getSession();
           if (!session) {
+            toast({
+              title: "Check your email",
+              description: "Check your email for a confirmation link, then sign in.",
+              type: "info",
+            });
             return {
               ok: false,
               error:
                 "Check your email for a confirmation link, then sign in.",
             };
           }
+          toast({
+            title: "Account created!",
+            description: "Your account has been created. Check your email to confirm.",
+            type: "success",
+          });
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully signed in.",
+            type: "success",
+          });
         }
 
         // Signed in (or just signed up). Migrate a richer local demo profile
@@ -159,6 +199,12 @@ export const useQuizStore = create<QuizStore>()(
       signOut: async () => {
         if (supabase) await supabase.auth.signOut();
         set({ progress: null, currentSession: null, practiceSession: null });
+        const toast = useToastStore.getState().addToast;
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+          type: "info",
+        });
       },
 
       hydrateProgress: async () => {

@@ -103,7 +103,7 @@ export function QuizPlayer() {
   const q = session?.questions[idx];
 
   const choose = useCallback(
-    (i: number) => {
+    async (i: number) => {
       if (lockedRef.current || !session) return;
       const target = session.questions[idx];
       if (!target) return;
@@ -256,17 +256,78 @@ export function QuizPlayer() {
           </motion.div>
         )}
 
-        <div className="mt-6">
-          <ShareResult
-            score={result.score}
-            total={result.total}
-            streak={progress?.streak ?? 0}
-          />
-        </div>
+        {/* Show detailed explanations after quiz */}
+        <div className="mt-8">
+          <h3 className="font-semibold text-ink mb-4">
+            Review your answers
+          </h3>
+          <div className="space-y-3">
+            {result.questions.map((question, i) => {
+              const answer = result.answers.find(a => a.questionId === question.id);
+              const isCorrect = answer?.correct ?? false;
+              const selectedIdx = answer?.selectedIndex ?? -1;
 
-        <Link href="/dashboard" className="mt-3 inline-block">
-          <Button>Back to dashboard</Button>
-        </Link>
+              return (
+                <div key={question.id} className="p-4 rounded-lg border bg-surface/50">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium text-ink">
+                      Question {i + 1}
+                    </span>
+                    <span className={cn(
+                      "px-2 py-1 rounded text-sm font-medium",
+                      isCorrect ? "bg-success/20 text-success" : "bg-error/20 text-error"
+                    )}>
+                      {isCorrect ? "Correct" : "Incorrect"}
+                    </span>
+                  </div>
+
+                  <div className="mb-3">
+                    <p className="text-sm text-ink-soft mb-2">{question.prompt}</p>
+                    <div className="space-y-2">
+                      {question.options.map((opt, optIdx) => (
+                        <div
+                          key={optIdx}
+                          className={cn(
+                            "flex items-start p-3 rounded border",
+                            selectedIdx === optIdx
+                              ? isCorrect
+                                ? "border-success bg-success/10"
+                                : "border-error bg-error/10"
+                              : "border-border-soft bg-surface/30"
+                          )}
+                        >
+                          <span className={cn(
+                            "flex-shrink-0 mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2",
+                            selectedIdx === optIdx
+                              ? isCorrect
+                                ? "border-success bg-success"
+                                : "border-error bg-error"
+                              : "border-ink/20"
+                          )} />
+                          <span className="ml-3 text-sm text-ink">{opt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 rounded border bg-primary/5">
+                    <p className="font-medium text-primary mb-2">Explanation:</p>
+                    <p className="text-sm text-ink-soft">{question.explanation}</p>
+                    <p className="mt-2 text-xs text-ink-soft">
+                      Source: <span className="font-medium">{question.source}</span>
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <Button variant="outline" onClick={() => setResult(null)}>
+              Back to dashboard
+            </Button>
+          </div>
+        </div>
       </motion.div>
     );
   }

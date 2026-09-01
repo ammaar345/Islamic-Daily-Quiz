@@ -16,7 +16,7 @@ const securityHeaders = [
       // 'unsafe-inline' for script/style is required because Next.js 16 App Router
       // emits inline bootstrap scripts and Framer Motion sets inline styles. A
       // nonce-based strict CSP is a future hardening step.
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",

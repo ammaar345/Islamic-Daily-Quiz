@@ -6,6 +6,7 @@ import { useQuizStore } from "@/lib/store";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { TopNav } from "@/components/TopNav";
+import { DevPanel } from "@/components/DevPanel";
 import { DailyReminder } from "@/components/DailyReminder";
 
 export default function AppLayout({
@@ -69,6 +70,7 @@ export default function AppLayout({
       <BackgroundPattern />
       <TopNav />
       <DailyReminder />
+      <DevPanel />
       <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-8 md:pb-12">
         {children}
       </main>

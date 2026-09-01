@@ -82,6 +82,52 @@ tsc clean, next build clean) and pushed as its own feature branch + main.
 **Not addressed this session (still open)**
 - See "TODO — priority actions" at the top of this file for the live list.
 
+## Audit session (2026-08-28)
+
+Comprehensive code audit of state management, daily-gate logic, and achievement
+derivation. All critical/UI-re-hydration bugs that were previously fixed were
+confirmed clean. Three findings surfaced:
+
+**[Low] `src/lib/progress.ts:levelFromXp()` — XP overflow silently dropped**
+- Cause: the `while` loop stops at level 100 and excess XP is discarded.
+- Impact: user progress could appear to stall near cap with no visible explanation.
+- Fix: consider exposing remaining XP in the level display (the UI already shows
+  `intoLevel`) so the user sees progress continuing visually.
+
+**[Low] `src/lib/achievements.ts:isNextDay()` — strict `===1` may fail on DST**
+  days.**
+- Cause: two consecutive calendar dates can have a 23h or 25h millisecond gap
+  when clocks shift.
+- Impact: `maxStreakDays()` and `hasComebackStreak()` could see a 1-day streak
+  break on a DST boundary.
+- Fix: change `diff === 1` to `diff > 0 && diff <= 2` to tolerate clock skew.
+
+**[Low] `src/lib/progress.ts:completeSession()` — `completedAt` real-time stamp**
+  vs DevPanel
+- Cause: `new Date().toISOString()` always uses system time, never the patched date.
+- Impact: if DevPanel is simulating "2026-08-27", the session `date` is 08-27
+  but `completedAt` is real-world now; the quiz still works, but history display
+  could look weird.
+- Fix: use `patchedDate ?? new Date()` (matching `localDate()`'s pattern) when
+  stamping `completedAt` in `completeSession()`.
+
+**Verified clean**: `QuizPlayer.tsx` re-hydration (lazy initializers correctly
+resume mid-quiz), result snapshotting (avoids null crash), idempotency guard
+(reload can't double-award XP), `finishQuiz()` transition clears
+`currentSession` then sets result.
+
+**Completed this session**:
+1. `src/lib/achievements.ts` — `isNextDay()` now tolerant to DST clock shifts.
+2. `src/lib/progress.ts` — `completeSession()` stamps `completedAt` from patched
+   date when DevPanel is active, so time-travel history is consistent.
+3. `src/components/QuizPlayer.tsx` — build error `question.question` → `question.prompt` (recurring from earlier sessions).
+4. `src/components/ui/Toast.tsx` — missed `useState`/`useEffect` imports fixed.
+5. `src/lib/store.ts` — `useToast` → `useToastStore` in all getState() call-sites.
+
+**Remaining**:
+- Verify with DevPanel time-travel across a DST boundary.
+- Document launch blockers (Supabase, question bank review).
+
 ## Changes this session (2026-08-19)
 
 **UI Improvement: Enhanced countdown timer visibility**

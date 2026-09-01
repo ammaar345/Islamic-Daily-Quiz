@@ -1,4 +1,5 @@
 import type { Tier, UserProgress } from "@/types";
+import { getPatchedDate } from "./dev-time";
 
 /* ---- Tuning knobs (backend flags in production) ---- */
 export const XP_CORRECT = 10;
@@ -60,15 +61,20 @@ export function xpForCorrect(streak: number): number {
 }
 
 /* ---- Dates ---- */
-export function localDate(d: Date = new Date()): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+export function localDate(d?: Date): string {
+  const now = d ?? getPatchedDate() ?? new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
+export function baseDate(): Date {
+  return getPatchedDate() ?? new Date();
+}
+
 function yesterday(): string {
-  const d = new Date();
+  const d = baseDate();
   d.setDate(d.getDate() - 1);
   return localDate(d);
 }
@@ -136,12 +142,13 @@ export function completeSession(
   const streaksToday = p.lastQuizDate === yesterday();
   const nextStreak = streaksToday ? p.streak + 1 : 1;
 
+  const stamp = getPatchedDate() ?? new Date();
   return {
     ...p,
     streak: nextStreak,
     lastQuizDate: today,
     sessions: p.sessions.map((s) =>
-      s.id === sessionId ? { ...s, completedAt: new Date().toISOString() } : s,
+      s.id === sessionId ? { ...s, completedAt: stamp.toISOString() } : s,
     ),
   };
 }
